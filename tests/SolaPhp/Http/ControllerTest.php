@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\SolaPhp\SolaPhp;
+namespace Tests\SolaPhp\Http;
 
 use PHPUnit\Framework\TestCase;
-use SolaPhp\SolaPhp\Controller;
+use SolaPhp\Http\Controller;
 
 class ControllerTest extends TestCase
 {

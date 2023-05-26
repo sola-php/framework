@@ -1,6 +1,6 @@
 <?php
 
-namespace SolaPhp\SolaPhp;
+namespace SolaPhp\Http;
 
 class Controller
 {

@@ -11,15 +11,15 @@ class Uri implements UriInterface
         'https' => 443,
     ];
 
-    private string $scheme;
-    private string $host;
-    private int $port;
-    private string $user;
-    private string $password;
-    private string $userInfo;
-    private string $path;
-    private string $query;
-    private string $fragment;
+    private ?string $scheme;
+    private ?string $host;
+    private ?int $port;
+    private ?string $user;
+    private ?string $password;
+    private ?string $userInfo;
+    private ?string $path;
+    private ?string $query;
+    private ?string $fragment;
 
     public function __construct(public string $uri = '')
     {
@@ -28,13 +28,14 @@ class Uri implements UriInterface
         }
 
         $urlParts = parse_url($uri);
-        if (false === $urlParts) {
-            throw new \InvalidArgumentException("Uri Invalid");
+
+        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
+            throw new \InvalidArgumentException("Invalid URI");
         }
 
         $this->scheme = $urlParts['scheme'] ?? null;
         $this->host = $urlParts['host'] ?? null;
-        $this->port = (int) $urlParts['port'] ?? null;
+        $this->port = $urlParts['port'] ?? null;
         $this->user = $urlParts['user'] ?? null;
         $this->password = $urlParts['pass'] ?? null;
         $this->path = $urlParts['path'] ?? null;
@@ -47,18 +48,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the scheme component of the URI.
-     *
-     * If no scheme is present, this method MUST return an empty string.
-     *
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.1.
-     *
-     * The trailing ":" character is not part of the scheme and MUST NOT be
-     * added.
-     *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.1
-     * @return string The URI scheme.
+     * @inheritDoc
      */
     public function getScheme(): string
     {
@@ -87,35 +77,15 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the user information component of the URI.
-     *
-     * If no user information is present, this method MUST return an empty
-     * string.
-     *
-     * If a user is present in the URI, this will return that value;
-     * additionally, if the password is also present, it will be appended to the
-     * user value, with a colon (":") separating the values.
-     *
-     * The trailing "@" character is not part of the user information and MUST
-     * NOT be added.
-     *
-     * @return string The URI user information, in "username[:password]" format.
+     * @inheritDoc
      */
     public function getUserInfo(): string
     {
-        return $this->userInfo;
+        return $this->userInfo ?? '';
     }
 
     /**
-     * Retrieve the host component of the URI.
-     *
-     * If no host is present, this method MUST return an empty string.
-     *
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.2.2.
-     *
-     * @see http://tools.ietf.org/html/rfc3986#section-3.2.2
-     * @return string The URI host.
+     * @inheritDoc
      */
     public function getHost(): string
     {
@@ -123,11 +93,13 @@ class Uri implements UriInterface
     }
 
     /**
-     * @todo Implement default port
      * @inheritDoc
      */
     public function getPort(): ?int
     {
+        if (null === $this->port) {
+            return self::SCHEMES[$this->scheme] ?? null;
+        }
         return $this->port;
     }
 
@@ -173,7 +145,7 @@ class Uri implements UriInterface
         $that = clone $this;
         $that->user = $user;
         $that->password = $password;
-
+        $that->userInfo = $user . ':' . $password;
         return $that;
     }
 
@@ -196,7 +168,7 @@ class Uri implements UriInterface
      */
     public function withPort(?int $port): UriInterface
     {
-        if (!filter_var($port, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 0xFFFF]])) {
+        if (false === filter_var($port, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 0xFFFF]])) {
             throw new \InvalidArgumentException("Invalid Port $port . Port should be between 0 and 65535");
         }
 
@@ -210,6 +182,7 @@ class Uri implements UriInterface
      */
     public function withPath(string $path): UriInterface
     {
+        $this->validatePath($path);
         $that = clone $this;
         $that->path = $path;
         return $that;
@@ -276,5 +249,21 @@ class Uri implements UriInterface
         }
 
         return $uri;
+    }
+
+    private function validatePath(string $path): string
+    {
+        $path = trim($path);
+        if (
+            false === filter_var(
+                $path,
+                FILTER_VALIDATE_REGEXP,
+                ['options' => ['regexp' => '/^\/.+/']]
+            )
+        ) {
+            throw new \InvalidArgumentException("Invalid Path");
+        }
+
+        return $path;
     }
 }

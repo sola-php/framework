@@ -29,8 +29,8 @@ class Uri implements UriInterface
 
         $urlParts = parse_url($uri);
 
-        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
-            throw new \InvalidArgumentException("Invalid URI");
+        if (false === $urlParts) {
+            throw new \InvalidArgumentException("Unable to parse URI: $uri");
         }
 
         $this->scheme = $urlParts['scheme'] ?? null;

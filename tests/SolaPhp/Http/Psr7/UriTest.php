@@ -29,7 +29,7 @@ class UriTest extends TestCase
         $this->assertEquals($this->uri->__toString(), $this->sampleUrl);
     }
 
-    public function testAnotherUrivalid()
+    public function testAnotherUriValid()
     {
         $uri2 = new Uri('http://hostname:9090/path?arg=value#anchor');
         $this->assertEquals($uri2->getHost(), 'hostname');
@@ -38,11 +38,11 @@ class UriTest extends TestCase
         $this->assertEquals($uri2->getUserInfo(), '');
     }
 
-    public function testInvalidURI()
+    public function testInvalidUri()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URI');
-        new Uri('http:hostname:9090path?arg=value#anchor');
+        $this->expectExceptionMessage('Unable to parse URI: ////');
+        new Uri('////');
     }
 
     public function testWithPath()

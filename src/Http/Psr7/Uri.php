@@ -64,8 +64,8 @@ class Uri implements UriInterface
             return '';
         }
 
-        $authority = $this->host;
-        if ('' !== $this->userInfo) {
+        $authority = $this->host ?? '';
+        if ('' !== $this->getUserInfo()) {
             $authority = $this->userInfo . '@' . $authority;
         }
 
@@ -217,7 +217,7 @@ class Uri implements UriInterface
     public function __toString(): string
     {
         $uri = '';
-        if ('' !== $this->scheme) {
+        if ($this->scheme && '' !== $this->scheme) {
             $uri .= $this->scheme . ':';
         }
         $authority = $this->getAuthority();
@@ -226,7 +226,7 @@ class Uri implements UriInterface
         }
 
         $path = $this->path;
-        if ('' !== $path) {
+        if ($path && '' !== $path) {
             if ('/' !== $path[0]) {
                 if ('' !== $authority) {
                     $path = '/' . $path;
@@ -240,11 +240,11 @@ class Uri implements UriInterface
             $uri .= $path;
         }
 
-        if ('' !== $this->query) {
+        if ($this->query && '' !== $this->query) {
             $uri .= '?' . $this->query;
         }
 
-        if ('' !== $this->fragment) {
+        if ($this->fragment && '' !== $this->fragment) {
             $uri .= '#' . $this->fragment;
         }
 

@@ -54,19 +54,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * Return an instance with the provided HTTP method.
-     *
-     * While HTTP method names are typically all uppercase characters, HTTP
-     * method names are case-sensitive and thus implementations SHOULD NOT
-     * modify the given string.
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * changed request method.
-     *
-     * @param string $method Case-sensitive method.
-     * @return static
-     * @throws \InvalidArgumentException for invalid HTTP methods.
+     * @inheritDoc
      */
     public function withMethod(string $method): RequestInterface
     {
@@ -78,13 +66,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * Retrieves the URI instance.
-     *
-     * This method MUST return a UriInterface instance.
-     *
-     * @link http://tools.ietf.org/html/rfc3986#section-4.3
-     * @return UriInterface Returns a UriInterface instance
-     *     representing the URI of the request.
+     * @inheritDoc
      */
     public function getUri(): UriInterface
     {
